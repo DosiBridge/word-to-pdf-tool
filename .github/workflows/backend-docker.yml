@@ -25,11 +25,12 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
+        working-directory: ./backend
         run: |
           docker build \
             --build-arg CORS_ORIGINS="${{ secrets.CORS_ORIGINS || 'http://localhost:3000' }}" \
             -t word-to-pdf-backend:latest \
-            ./backend
+            .
 
       - name: Push Docker image
         run: |
