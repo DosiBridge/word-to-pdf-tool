@@ -11,5 +11,6 @@ uploads/
 *.docx
 *.doc
 *.txt
+!requirements.txt
 .DS_Store
 

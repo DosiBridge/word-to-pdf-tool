@@ -11,6 +11,9 @@ ENV/
 *.docx
 *.doc
 *.txt
+!backend/requirements.txt
+!frontend/package.json
+!frontend/package-lock.json
 
 # Node
 node_modules/

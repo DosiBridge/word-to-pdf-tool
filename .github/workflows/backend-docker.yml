@@ -24,13 +24,20 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Verify backend files
+        run: |
+          echo "Checking backend directory:"
+          ls -la backend/
+          echo "Checking for requirements.txt:"
+          ls -la backend/requirements.txt || echo "requirements.txt NOT FOUND"
+
       - name: Build Docker image
-        working-directory: ./backend
         run: |
           docker build \
             --build-arg CORS_ORIGINS="${{ secrets.CORS_ORIGINS || 'http://localhost:3000' }}" \
+            -f backend/Dockerfile \
             -t word-to-pdf-backend:latest \
-            .
+            backend/
 
       - name: Push Docker image
         run: |
