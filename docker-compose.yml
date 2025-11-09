@@ -1,16 +1,14 @@
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME:-yourusername}/word-to-pdf-backend:latest
     container_name: document-converter-backend
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app
-      - /app/uploads
+      - backend-uploads:/app/uploads
     environment:
       - PYTHONUNBUFFERED=1
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
@@ -20,14 +18,12 @@ services:
       start_period: 40s
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME:-yourusername}/word-to-pdf-frontend:latest
     container_name: document-converter-frontend
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
     depends_on:
       backend:
         condition: service_healthy
@@ -38,4 +34,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+volumes:
+  backend-uploads:
 
