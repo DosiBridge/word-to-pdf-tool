@@ -1,0 +1,22 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+ENV/
+.venv
+*.so
+.git
+.gitignore
+README.md
+.DS_Store
+uploads/
+*.pdf
+*.docx
+*.doc
+start.sh
+# Don't exclude requirements.txt - it's needed for the build
+!requirements.txt
+
