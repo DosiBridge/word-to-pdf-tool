@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Document Converter - PDF, Word, Text Converter",
-  description: "Convert between PDF, Word, and text formats. Unlock password-protected PDFs.",
+  title: "DosiBridge - Document Converter",
+  description: "DosiBridge - Convert between PDF, Word, and text formats. Unlock password-protected PDFs.",
 };
 
 export default function RootLayout({

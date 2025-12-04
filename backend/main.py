@@ -47,7 +47,9 @@ async def pdf_to_word(file: UploadFile = File(...)):
     try:
         # Save uploaded file
         temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        temp_pdf.close()
         temp_docx = tempfile.NamedTemporaryFile(delete=False, suffix='.docx')
+        temp_docx.close()
         
         with open(temp_pdf.name, 'wb') as f:
             shutil.copyfileobj(file.file, f)
@@ -60,12 +62,18 @@ async def pdf_to_word(file: UploadFile = File(...)):
         # Clean up PDF file
         os.unlink(temp_pdf.name)
         
+        output_filename = file.filename.replace('.pdf', '.docx')
         return FileResponse(
             temp_docx.name,
             media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            filename=file.filename.replace('.pdf', '.docx')
+            filename=output_filename,
+            headers={"Content-Disposition": f'attachment; filename="{output_filename}"'}
         )
     except Exception as e:
+        import traceback
+        import sys
+        traceback.print_exc(file=sys.stderr)
+
         if os.path.exists(temp_pdf.name):
             os.unlink(temp_pdf.name)
         if os.path.exists(temp_docx.name):
@@ -82,7 +90,9 @@ async def word_to_pdf(file: UploadFile = File(...)):
     try:
         # Save uploaded file
         temp_docx = tempfile.NamedTemporaryFile(delete=False, suffix='.docx')
+        temp_docx.close()
         temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        temp_pdf.close()
         
         with open(temp_docx.name, 'wb') as f:
             shutil.copyfileobj(file.file, f)
@@ -139,12 +149,18 @@ async def word_to_pdf(file: UploadFile = File(...)):
         # Clean up DOCX file
         os.unlink(temp_docx.name)
         
+        output_filename = file.filename.replace('.docx', '.pdf').replace('.doc', '.pdf')
         return FileResponse(
             temp_pdf.name,
             media_type="application/pdf",
-            filename=file.filename.replace('.docx', '.pdf').replace('.doc', '.pdf')
+            filename=output_filename,
+            headers={"Content-Disposition": f'attachment; filename="{output_filename}"'}
         )
     except Exception as e:
+        import traceback
+        import sys
+        traceback.print_exc(file=sys.stderr)
+
         if os.path.exists(temp_docx.name):
             os.unlink(temp_docx.name)
         if os.path.exists(temp_pdf.name):
@@ -161,7 +177,9 @@ async def pdf_to_txt(file: UploadFile = File(...)):
     try:
         # Save uploaded file
         temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        temp_pdf.close()
         temp_txt = tempfile.NamedTemporaryFile(delete=False, suffix='.txt', mode='w')
+        temp_txt.close()
         
         with open(temp_pdf.name, 'wb') as f:
             shutil.copyfileobj(file.file, f)
@@ -178,18 +196,24 @@ async def pdf_to_txt(file: UploadFile = File(...)):
         
         # Write text to file
         full_text = "\n\n".join(text_content)
-        temp_txt.write(full_text)
-        temp_txt.close()
+        with open(temp_txt.name, 'w', encoding='utf-8') as f:
+            f.write(full_text)
         
         # Clean up PDF file
         os.unlink(temp_pdf.name)
         
+        output_filename = file.filename.replace('.pdf', '.txt')
         return FileResponse(
             temp_txt.name,
             media_type="text/plain",
-            filename=file.filename.replace('.pdf', '.txt')
+            filename=output_filename,
+            headers={"Content-Disposition": f'attachment; filename="{output_filename}"'}
         )
     except Exception as e:
+        import traceback
+        import sys
+        traceback.print_exc(file=sys.stderr)
+
         if os.path.exists(temp_pdf.name):
             os.unlink(temp_pdf.name)
         if os.path.exists(temp_txt.name):
@@ -209,7 +233,9 @@ async def pdf_unlock(
     try:
         # Save uploaded file
         temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        temp_pdf.close()
         temp_unlocked = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        temp_unlocked.close()
         
         with open(temp_pdf.name, 'wb') as f:
             shutil.copyfileobj(file.file, f)
@@ -246,10 +272,12 @@ async def pdf_unlock(
         # Clean up original PDF
         os.unlink(temp_pdf.name)
         
+        output_filename = f"unlocked_{file.filename}"
         return FileResponse(
             temp_unlocked.name,
             media_type="application/pdf",
-            filename=f"unlocked_{file.filename}"
+            filename=output_filename,
+            headers={"Content-Disposition": f'attachment; filename="{output_filename}"'}
         )
     except pypdf.errors.PdfReadError as e:
         if os.path.exists(temp_pdf.name):
@@ -263,6 +291,138 @@ async def pdf_unlock(
         if os.path.exists(temp_unlocked.name):
             os.unlink(temp_unlocked.name)
         raise HTTPException(status_code=500, detail=f"Unlocking failed: {str(e)}")
+
+
+@app.post("/api/merge-pdfs")
+async def merge_pdfs(files: list[UploadFile] = File(...)):
+    """Merge multiple PDFs into one"""
+    if len(files) < 2:
+        raise HTTPException(status_code=400, detail="At least two PDF files are required")
+    
+    temp_files = []
+    temp_merged = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+    
+    try:
+        merger = pypdf.PdfWriter()
+        
+        for file in files:
+            if not file.filename.endswith('.pdf'):
+                raise HTTPException(status_code=400, detail=f"File {file.filename} is not a PDF")
+            
+            temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+            temp_pdf.close()
+            temp_files.append(temp_pdf.name)
+            
+            with open(temp_pdf.name, 'wb') as f:
+                shutil.copyfileobj(file.file, f)
+                
+            merger.append(temp_pdf.name)
+            
+        merger.write(temp_merged.name)
+        merger.close()
+        
+        # Clean up input files
+        for temp_file in temp_files:
+            if os.path.exists(temp_file):
+                os.unlink(temp_file)
+                
+        output_filename = "merged_document.pdf"
+        return FileResponse(
+            temp_merged.name,
+            media_type="application/pdf",
+            filename=output_filename,
+            headers={"Content-Disposition": f'attachment; filename="{output_filename}"'}
+        )
+    except Exception as e:
+        # Clean up all temp files
+        for temp_file in temp_files:
+            if os.path.exists(temp_file):
+                os.unlink(temp_file)
+        if os.path.exists(temp_merged.name):
+            os.unlink(temp_merged.name)
+        raise HTTPException(status_code=500, detail=f"Merge failed: {str(e)}")
+
+
+@app.post("/api/split-pdf")
+async def split_pdf(
+    file: UploadFile = File(...),
+    pages: str = Form(...)  # Format: "1,3-5,7" or "all"
+):
+    """Split PDF or extract specific pages"""
+    if not file.filename.endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="File must be a PDF")
+        
+    try:
+        # Save uploaded file
+        temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        temp_pdf.close()
+        temp_output = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        temp_output.close()
+        
+        with open(temp_pdf.name, 'wb') as f:
+            shutil.copyfileobj(file.file, f)
+            
+        reader = pypdf.PdfReader(temp_pdf.name)
+        writer = pypdf.PdfWriter()
+        total_pages = len(reader.pages)
+        
+        if pages.lower() == "all":
+            # Just copy the file if all pages requested (or maybe user wants to burst split? 
+            # For now, let's assume extracting specific pages into a NEW pdf)
+            # If "all", we might want to return a zip of single pages, but for simplicity let's just return the same pdf
+            # Or better, let's interpret "all" as "extract all pages into one new PDF" which is same as original.
+            # Let's support range extraction into a single PDF.
+            selected_indices = range(total_pages)
+        else:
+            selected_indices = set()
+            parts = pages.split(',')
+            for part in parts:
+                part = part.strip()
+                if '-' in part:
+                    start, end = map(int, part.split('-'))
+                    # Adjust for 1-based indexing from user
+                    selected_indices.update(range(start - 1, end))
+                else:
+                    selected_indices.add(int(part) - 1)
+            
+            selected_indices = sorted([i for i in selected_indices if 0 <= i < total_pages])
+            
+        if not selected_indices:
+             raise HTTPException(status_code=400, detail="No valid pages selected")
+
+        for i in selected_indices:
+            writer.add_page(reader.pages[i])
+            
+        with open(temp_output.name, 'wb') as f:
+            writer.write(f)
+            
+        # Clean up original
+        os.unlink(temp_pdf.name)
+        
+        output_filename = f"split_{file.filename}"
+        return FileResponse(
+            temp_output.name,
+            media_type="application/pdf",
+            filename=output_filename,
+            headers={"Content-Disposition": f'attachment; filename="{output_filename}"'}
+        )
+        
+    except ValueError:
+        if os.path.exists(temp_pdf.name):
+            os.unlink(temp_pdf.name)
+        if os.path.exists(temp_output.name):
+            os.unlink(temp_output.name)
+        raise HTTPException(status_code=400, detail="Invalid page range format")
+    except Exception as e:
+        import traceback
+        import sys
+        traceback.print_exc(file=sys.stderr)
+            
+        if os.path.exists(temp_pdf.name):
+            os.unlink(temp_pdf.name)
+        if os.path.exists(temp_output.name):
+            os.unlink(temp_output.name)
+        raise HTTPException(status_code=500, detail=f"Split failed: {str(e)}")
 
 
 if __name__ == "__main__":
