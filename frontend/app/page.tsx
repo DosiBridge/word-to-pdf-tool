@@ -6,37 +6,61 @@ import Footer from '@/components/Footer';
 import { useState } from 'react';
 
 const featuredTools = [
-  { name: 'PDF to Word', href: '/pdf-to-word', icon: '📝', desc: 'Convert PDF to editable Word documents', color: 'blue' },
-  { name: 'Merge PDF', href: '/merge-pdf', icon: '🖇️', desc: 'Combine multiple PDFs into one', color: 'purple' },
-  { name: 'Compress PDF', href: '/compress-pdf', icon: '🗜️', desc: 'Reduce PDF file size', color: 'green' },
-  { name: 'Protect PDF', href: '/protect-pdf', icon: '🔐', desc: 'Add password protection', color: 'red' },
+  {
+    name: 'PDF to Word',
+    href: '/pdf-to-word',
+    icon: '📝',
+    desc: 'Transform PDFs into fully editable Word documents while preserving formatting, fonts, and images',
+    color: 'blue'
+  },
+  {
+    name: 'Merge PDF',
+    href: '/merge-pdf',
+    icon: '🖇️',
+    desc: 'Combine multiple PDF files into a single document with perfect page ordering',
+    color: 'purple'
+  },
+  {
+    name: 'Compress PDF',
+    href: '/compress-pdf',
+    icon: '🗜️',
+    desc: 'Reduce PDF file size up to 90% without compromising visual quality',
+    color: 'green'
+  },
+  {
+    name: 'Protect PDF',
+    href: '/protect-pdf',
+    icon: '🔐',
+    desc: 'Secure your PDFs with password protection and custom permission controls',
+    color: 'red'
+  },
 ];
 
 const allTools = [
-  { name: 'PDF to Word', href: '/pdf-to-word', icon: '📝', category: 'Convert' },
-  { name: 'Word to PDF', href: '/word-to-pdf', icon: '📄', category: 'Convert' },
-  { name: 'PDF to Excel', href: '/pdf-to-excel', icon: '📈', category: 'Convert' },
-  { name: 'Excel to PDF', href: '/excel-to-pdf', icon: '📊', category: 'Convert' },
-  { name: 'PDF to PowerPoint', href: '/pdf-to-powerpoint', icon: '📊', category: 'Convert' },
-  { name: 'PowerPoint to PDF', href: '/powerpoint-to-pdf', icon: '📽️', category: 'Convert' },
-  { name: 'PDF to JPG', href: '/pdf-to-jpg', icon: '🖼️', category: 'Convert' },
-  { name: 'JPG to PDF', href: '/jpg-to-pdf', icon: '📷', category: 'Convert' },
-  { name: 'Merge PDF', href: '/merge-pdf', icon: '🖇️', category: 'Organize' },
-  { name: 'Split PDF', href: '/split-pdf', icon: '✂️', category: 'Organize' },
-  { name: 'Compress PDF', href: '/compress-pdf', icon: '🗜️', category: 'Edit' },
-  { name: 'Rotate PDF', href: '/rotate-pdf', icon: '🔄', category: 'Edit' },
-  { name: 'Extract Pages', href: '/extract-pages', icon: '📑', category: 'Organize' },
-  { name: 'Remove Pages', href: '/remove-pages', icon: '🗑️', category: 'Organize' },
-  { name: 'Organize PDF', href: '/organize-pdf', icon: '📋', category: 'Organize' },
-  { name: 'Crop PDF', href: '/crop-pdf', icon: '✂️', category: 'Edit' },
-  { name: 'Add Watermark', href: '/add-watermark', icon: '💧', category: 'Edit' },
-  { name: 'Add Page Numbers', href: '/add-page-numbers', icon: '🔢', category: 'Edit' },
-  { name: 'Protect PDF', href: '/protect-pdf', icon: '🔐', category: 'Secure' },
-  { name: 'Unlock PDF', href: '/unlock-pdf', icon: '🔓', category: 'Secure' },
-  { name: 'Sign PDF', href: '/sign-pdf', icon: '✒️', category: 'Secure' },
-  { name: 'Redact PDF', href: '/redact-pdf', icon: '▓', category: 'Secure' },
-  { name: 'OCR PDF', href: '/ocr-pdf', icon: '👁️', category: 'Advanced' },
-  { name: 'Repair PDF', href: '/repair-pdf', icon: '🔧', category: 'Advanced' },
+  { name: 'PDF to Word', href: '/pdf-to-word', icon: '📝', category: 'Convert', desc: 'Convert PDFs to editable DOCX format' },
+  { name: 'Word to PDF', href: '/word-to-pdf', icon: '📄', category: 'Convert', desc: 'Convert Word documents to PDF' },
+  { name: 'PDF to Excel', href: '/pdf-to-excel', icon: '📈', category: 'Convert', desc: 'Extract tables and data to Excel' },
+  { name: 'Excel to PDF', href: '/excel-to-pdf', icon: '📊', category: 'Convert', desc: 'Convert spreadsheets to PDF' },
+  { name: 'PDF to PowerPoint', href: '/pdf-to-powerpoint', icon: '📊', category: 'Convert', desc: 'Convert PDF pages to slides' },
+  { name: 'PowerPoint to PDF', href: '/powerpoint-to-pdf', icon: '📽️', category: 'Convert', desc: 'Convert presentations to PDF' },
+  { name: 'PDF to JPG', href: '/pdf-to-jpg', icon: '🖼️', category: 'Convert', desc: 'Convert PDF pages to images' },
+  { name: 'JPG to PDF', href: '/jpg-to-pdf', icon: '📷', category: 'Convert', desc: 'Create PDF from images' },
+  { name: 'Merge PDF', href: '/merge-pdf', icon: '🖇️', category: 'Organize', desc: 'Combine multiple PDFs' },
+  { name: 'Split PDF', href: '/split-pdf', icon: '✂️', category: 'Organize', desc: 'Split PDF into pages' },
+  { name: 'Compress PDF', href: '/compress-pdf', icon: '🗜️', category: 'Edit', desc: 'Reduce file size' },
+  { name: 'Rotate PDF', href: '/rotate-pdf', icon: '🔄', category: 'Edit', desc: 'Rotate PDF pages' },
+  { name: 'Extract Pages', href: '/extract-pages', icon: '📑', category: 'Organize', desc: 'Extract specific pages' },
+  { name: 'Remove Pages', href: '/remove-pages', icon: '🗑️', category: 'Organize', desc: 'Delete unwanted pages' },
+  { name: 'Organize PDF', href: '/organize-pdf', icon: '📋', category: 'Organize', desc: 'Reorder PDF pages' },
+  { name: 'Crop PDF', href: '/crop-pdf', icon: '✂️', category: 'Edit', desc: 'Crop PDF margins' },
+  { name: 'Add Watermark', href: '/add-watermark', icon: '💧', category: 'Edit', desc: 'Add text watermarks' },
+  { name: 'Add Page Numbers', href: '/add-page-numbers', icon: '🔢', category: 'Edit', desc: 'Number PDF pages' },
+  { name: 'Protect PDF', href: '/protect-pdf', icon: '🔐', category: 'Secure', desc: 'Password protect PDF' },
+  { name: 'Unlock PDF', href: '/unlock-pdf', icon: '🔓', category: 'Secure', desc: 'Remove PDF password' },
+  { name: 'Sign PDF', href: '/sign-pdf', icon: '✒️', category: 'Secure', desc: 'Add digital signature' },
+  { name: 'Redact PDF', href: '/redact-pdf', icon: '▓', category: 'Secure', desc: 'Redact sensitive text' },
+  { name: 'OCR PDF', href: '/ocr-pdf', icon: '👁️', category: 'Advanced', desc: 'Extract text via OCR' },
+  { name: 'Repair PDF', href: '/repair-pdf', icon: '🔧', category: 'Advanced', desc: 'Fix corrupted PDFs' },
 ];
 
 export default function Home() {
@@ -153,8 +177,8 @@ export default function Home() {
                     key={category}
                     onClick={() => setSelectedCategory(category)}
                     className={`px-6 py-2 rounded-full font-medium transition-all ${selectedCategory === category
-                        ? 'bg-blue-600 text-white shadow-lg'
-                        : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-blue-50 dark:hover:bg-zinc-700'
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-blue-50 dark:hover:bg-zinc-700'
                       }`}
                   >
                     {category}
