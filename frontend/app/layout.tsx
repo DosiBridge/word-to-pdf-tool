@@ -1,33 +1,27 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import AOSInit from '@/components/AOSInit';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "Document Converter - PDF, Word, Text Converter",
-  description: "Convert between PDF, Word, and text formats. Unlock password-protected PDFs.",
+  title: 'DosiBridge - Professional PDF Converter & Editor',
+  description: 'Convert, compress, merge, and secure PDFs with 30+ professional tools. Fast, free, and secure. No registration required.',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <head>
+      </head>
+      <body className={inter.className}>
         {children}
+        <AOSInit />
       </body>
     </html>
   );
